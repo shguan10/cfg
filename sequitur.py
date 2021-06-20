@@ -1,4 +1,4 @@
-acceptable_chars = "an"
+acceptable_chars = "ban"
 chars2num = {c:ind for ind,c in enumerate(acceptable_chars)}
 
 import pdb
@@ -103,9 +103,25 @@ def sequitur(s):
       rules[user] = newrule
     rname+=1
 
-  return list(enumerate(rules)),nums
+  return rules,nums
 
+def decodeCFG(rules,nums,numsind=0):
+  # decodes the nums according to rules
+  buffer = []
+  if numsind>=len(nums):
+    return buffer
+
+  rule2decode = nums[numsind]
+  if rule2decode < len(acceptable_chars):
+    buffer.extend(rules[rule2decode])
+  else:
+    # it's a non-terminal
+    buffer.extend(decodeCFG(rules,rules[rule2decode]))
+
+  buffer.extend(decodeCFG(rules,nums,numsind+1))
+  return buffer
 
 if __name__ == '__main__':
-  print(sequitur("aaa"))
+  # print(sequitur("aaa"))
   # print(sequitur("anan anan  anan anan"))
+  print(''.join(decodeCFG(*sequitur("banana"))))
