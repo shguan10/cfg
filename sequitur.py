@@ -1,4 +1,4 @@
-acceptable_chars = "qwe"
+acceptable_chars = "an"
 chars2num = {c:ind for ind,c in enumerate(acceptable_chars)}
 
 import pdb
@@ -24,7 +24,9 @@ def sequitur(s):
       # see if prevchar,curchar is a known bigram
       bmatch = None
       for ii,b in enumerate(bigrams): 
-        if b[0]==prevchar and b[1] == curchar:
+        if b[0]==prevchar and \
+            b[1] == curchar and \
+            b[2] != ind-1:
           bmatch = ii
       if bmatch is None:
         # we have not seen this bigram yet, so add it to bigrams
@@ -69,39 +71,41 @@ def sequitur(s):
       # replace nums with newnums
       nums = newnums
 
-      # consider if we have to prune our rules
-
-      # count the number of times a rule appears
-      rcounts = [0 for _ in range(len(rules))]
-      rlocs = [None for _ in range(len(rules))]
-      rname = startofnonterminals
-      while rname < len(rules):
-        # read the rule
-        for place,ch in enumerate(rules[rname]):
-          rcounts[ch] += 1
-          rlocs[ch] = (rname,place)
-        rname+=1
-
-      # now prune the rules that only appeared once
-      rname = startofnonterminals
-      while rname < len(rules):
-        # how many times did it appear?
-        if rcounts[rname]==1:
-          # prune it!
-          user,userplace = rlocs[rname]
-          prevrule = list(rules[user])
-          newrule = prevrule[:userplace] + \
-                    list(rules[rname]) + \
-                    (prevrule[userplace+1:] 
-                      if userplace < len(prevrule) else [])
-          rules[user] = newrule
-        rname+=1
-
     else: 
       break
+
+  # consider if we have to prune our rules
+
+  # count the number of times a rule appears
+  rcounts = [0 for _ in range(len(rules))]
+  rlocs = [None for _ in range(len(rules))]
+  rname = startofnonterminals
+  while rname < len(rules):
+    # read the rule
+    for place,ch in enumerate(rules[rname]):
+      rcounts[ch] += 1
+      # keep track of in which rule and where in the rule it is used
+      rlocs[ch] = (rname,place)
+    rname+=1
+
+  # now prune the rules that only appeared once
+  rname = startofnonterminals
+  while rname < len(rules):
+    # how many times did it appear?
+    if rcounts[rname]==1:
+      # prune it!
+      user,userplace = rlocs[rname]
+      prevrule = list(rules[user])
+      newrule = prevrule[:userplace] + \
+                list(rules[rname]) + \
+                (prevrule[userplace+1:] 
+                  if userplace < len(prevrule) else [])
+      rules[user] = newrule
+    rname+=1
 
   return list(enumerate(rules)),nums
 
 
 if __name__ == '__main__':
-  print(sequitur("qwqqwq"))
+  print(sequitur("aaa"))
+  # print(sequitur("anan anan  anan anan"))
