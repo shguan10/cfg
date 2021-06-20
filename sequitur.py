@@ -12,7 +12,7 @@ def sequitur(s):
     addedrule = False
     # read through nums, counting the bigrams
     ind = -1
-    while ind+1 < len(nums) and len(nums)>=2:
+    while ind+1 < len(nums) and len(nums)>2:
       ind += 1
       if ind==0: continue
       prevchar = nums[ind-1]
@@ -70,8 +70,32 @@ def sequitur(s):
       nums = newnums
 
       # consider if we have to prune our rules
-      # count the number of times a rule appears
 
+      # count the number of times a rule appears
+      rcounts = [0 for _ in range(len(rules))]
+      rlocs = [None for _ in range(len(rules))]
+      rname = startofnonterminals
+      while rname < len(rules):
+        # read the rule
+        for place,ch in enumerate(rules[rname]):
+          rcounts[ch] += 1
+          rlocs[ch] = (rname,place)
+        rname+=1
+
+      # now prune the rules that only appeared once
+      rname = startofnonterminals
+      while rname < len(rules):
+        # how many times did it appear?
+        if rcounts[rname]==1:
+          # prune it!
+          user,userplace = rlocs[rname]
+          prevrule = list(rules[user])
+          newrule = prevrule[:userplace] + \
+                    list(rules[rname]) + \
+                    (prevrule[userplace+1:] 
+                      if userplace < len(prevrule) else [])
+          rules[user] = newrule
+        rname+=1
 
     else: 
       break
