@@ -1,15 +1,18 @@
-acceptable_chars = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+acceptable_chars = "qwe"
 chars2num = {c:ind for ind,c in enumerate(acceptable_chars)}
 
+import pdb
+
 def sequitur(s):
-  nums = [chars2num[c] for c in s if c is in acceptable_chars]
+  nums = [chars2num[c] for c in s if c in acceptable_chars]
   rules = list(acceptable_chars)
+  startofnonterminals = len(rules)
   while True:
     bigrams = []
     addedrule = False
     # read through nums, counting the bigrams
     ind = -1
-    while ind < len(nums) and len(nums)>=2:
+    while ind+1 < len(nums) and len(nums)>=2:
       ind += 1
       if ind==0: continue
       prevchar = nums[ind-1]
@@ -53,18 +56,27 @@ def sequitur(s):
     if addedrule:
       newnums = []
       ind = -1
-      while ind < len(nums):
+      while ind+1 < len(nums):
         ind+=1
         if nums[ind]<0:
+          # replace the next bigram with a rule
           rule = -nums[ind]
           newnums.append(rule)
           ind+=1 # skip the next char because it is part of the same bigram
+        else:
+          # curchar is not in a rule, so just append it to newnums
+          newnums.append(nums[ind])
       # replace nums with newnums
       nums = newnums
+
+      # consider if we have to prune our rules
+      # count the number of times a rule appears
+
+
     else: 
       break
-      
-  return rules
+
+  return list(enumerate(rules)),nums
 
 
 if __name__ == '__main__':
