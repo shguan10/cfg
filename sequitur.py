@@ -1,12 +1,12 @@
 acceptable_chars = "abc"
 chars2num = {c:ind for ind,c in enumerate(acceptable_chars)}
+startofnonterminals = len(acceptable_chars)
 
 import pdb
 
 def sequitur(s):
   nums = [chars2num[c] for c in s if c in acceptable_chars]
   rules = list(acceptable_chars)
-  startofnonterminals = len(rules)
   while True:
     bigrams = []
     addedrule = False
@@ -86,9 +86,11 @@ def sequitur(s):
     else: 
       break
 
-  # consider if we have to prune our rules
   rules.append(nums)
+  rules = prunerules(rules)
+  return rules,rules[-1]
 
+def prunerules(rules):
   # count the number of times a rule appears
   rcounts = [0 for _ in range(len(rules))]
   rlocs = [None for _ in range(len(rules))]
@@ -101,15 +103,11 @@ def sequitur(s):
       rlocs[ch] = (rname)
     rname+=1
 
-  # print("rules: ",list(enumerate(rules)))
-  # print("rcounts",rcounts)
-
   # now prune the rules that only appeared once
   rname = startofnonterminals
   while rname < len(rules):
     # how many times did it appear?
     if rcounts[rname]==1:
-      # print("pruning rule ",rname)
       # prune it!
       user = rlocs[rname]
       prevrule = list(rules[user])
@@ -119,12 +117,8 @@ def sequitur(s):
                   list(rules[rname]) +\
                   (prevrule[ii+1:]) if ii<len(prevrule) else []
       rules[user] = newrule
-      # print("new rules: ")
-      # print(list(enumerate(rules)))
-      # print("".join(decodeCFG(rules,nums)))
     rname+=1
-
-  return rules,rules[-1]
+  return rules
 
 def decodeCFG(rules,nums,numsind=0):
   # decodes the nums according to rules
