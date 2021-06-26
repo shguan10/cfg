@@ -10,16 +10,10 @@ def sequitur(s):
   while True:
     bigrams = []
     addedrule = False
-    # print(list(enumerate(rules)),"\t",nums)
-    # print("".join(decodeCFG(rules,nums)))
     # read through nums, counting the bigrams
     ind = -1
     while ind+1 < len(nums) and len(nums)>2:
       ind += 1
-      # ding =ind
-      # print("processing",ding)
-      # print(list(enumerate(rules)),"\t",nums)
-      # print(bigrams)
       if ind==0: continue
       prevchar = nums[ind-1]
       curchar = nums[ind]
@@ -63,9 +57,6 @@ def sequitur(s):
         nums[ind] = -rmatch
         nums[ind-1] = -rmatch
         
-        # print("processed",ding)
-        # print(list(enumerate(rules)),"\t",nums)
-        # print(bigrams)
     # replace the string with the new chars
     if addedrule:
       newnums = []
