@@ -1,4 +1,4 @@
-acceptable_chars = "abcdefghijklmnopqrstuvwxyz"
+acceptable_chars = "abc"
 chars2num = {c:ind for ind,c in enumerate(acceptable_chars)}
 
 import pdb
@@ -32,15 +32,12 @@ def sequitur(s):
       for ii,b in enumerate(bigrams): 
         if b[0]==prevchar and \
             b[1] == curchar and \
-            b[2] != ind-1:
+            b[3] != ind-1:
           bmatch = ii
       if bmatch is None:
         # we have not seen this bigram yet, so add it to bigrams
         bigrams.append((prevchar,curchar,ind-1,ind))
       else:
-        # skip if the original bigram overlaps with the current one
-        if bigrams[bmatch][3] == ind-1: continue
-
         # check if it is in rules
         rmatch = None
         for ii,r in enumerate(rules): 
@@ -66,8 +63,6 @@ def sequitur(s):
         nums[ind] = -rmatch
         nums[ind-1] = -rmatch
         
-        # we are replacing this bigram with a rule so skip the next bigram
-        ind+=1
         # print("processed",ding)
         # print(list(enumerate(rules)),"\t",nums)
         # print(bigrams)
@@ -152,11 +147,13 @@ def teststr(s):
   # print(list(enumerate(rules)),"\t",nums)
   d = ''.join(decodeCFG(rules,nums))
   # print(d)
-  assert s==d
+  if s!=d: 
+    print(s)
+    assert False
 
 if __name__ == '__main__':
   import numpy as np
-  lens = np.random.rand(1000) * 100
+  lens = np.random.rand(1000) * 1000
   for ln in lens:
     ln = int(ln)
     chars = [int(np.random.rand()*len(acceptable_chars)) for _ in range(ln)]
