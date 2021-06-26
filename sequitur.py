@@ -10,8 +10,8 @@ def sequitur(s):
   while True:
     bigrams = []
     addedrule = False
-    print(list(enumerate(rules)),"\t",nums)
-    print("".join(decodeCFG(rules,nums)))
+    # print(list(enumerate(rules)),"\t",nums)
+    # print("".join(decodeCFG(rules,nums)))
     # read through nums, counting the bigrams
     ind = -1
     while ind+1 < len(nums) and len(nums)>2:
@@ -83,33 +83,43 @@ def sequitur(s):
       break
 
   # consider if we have to prune our rules
+  rules.append(nums)
 
-  # # count the number of times a rule appears
-  # rcounts = [0 for _ in range(len(rules))]
-  # rlocs = [None for _ in range(len(rules))]
-  # rname = startofnonterminals
-  # while rname < len(rules):
-  #   # read the rule
-  #   for place,ch in enumerate(rules[rname]):
-  #     rcounts[ch] += 1
-  #     # keep track of in which rule and where in the rule it is used
-  #     rlocs[ch] = (rname,place)
-  #   rname+=1
+  # count the number of times a rule appears
+  rcounts = [0 for _ in range(len(rules))]
+  rlocs = [None for _ in range(len(rules))]
+  rname = startofnonterminals
+  while rname < len(rules):
+    # read the rule
+    for place,ch in enumerate(rules[rname]):
+      rcounts[ch] += 1
+      # keep track of in which rule it is used
+      rlocs[ch] = (rname)
+    rname+=1
 
-  # # now prune the rules that only appeared once
-  # rname = startofnonterminals
-  # while rname < len(rules):
-  #   # how many times did it appear?
-  #   if rcounts[rname]==1:
-  #     # prune it!
-  #     user,userplace = rlocs[rname]
-  #     prevrule = list(rules[user])
-  #     newrule = prevrule[:userplace] + \
-  #               list(rules[rname]) + \
-  #               (prevrule[userplace+1:] 
-  #                 if userplace < len(prevrule) else [])
-  #     rules[user] = newrule
-  #   rname+=1
+  # print("rules: ",list(enumerate(rules)))
+  # print("rcounts",rcounts)
+
+  # now prune the rules that only appeared once
+  rname = startofnonterminals
+  while rname < len(rules):
+    # how many times did it appear?
+    if rcounts[rname]==1:
+      # print("pruning rule ",rname)
+      # prune it!
+      user = rlocs[rname]
+      prevrule = list(rules[user])
+      ii = 0
+      while ii<len(prevrule) and prevrule[ii]!=rname: ii+=1
+      newrule = list(prevrule[:ii]) +\
+                  list(rules[rname]) +\
+                  (prevrule[ii+1:]) if ii<len(prevrule) else []
+      rules[user] = newrule
+      # print("new rules: ")
+      # print(list(enumerate(rules)))
+      # print("".join(decodeCFG(rules,nums)))
+
+    rname+=1
 
   return rules,nums
 
