@@ -1,4 +1,4 @@
-acceptable_chars = "ban"
+acceptable_chars = "abcdefghijklmnopqrstuvwxyz"
 chars2num = {c:ind for ind,c in enumerate(acceptable_chars)}
 
 import pdb
@@ -10,8 +10,8 @@ def sequitur(s):
   while True:
     bigrams = []
     addedrule = False
-    print(list(enumerate(rules)),"\t",nums)
-    print("".join(decodeCFG(rules,nums)))
+    # print(list(enumerate(rules)),"\t",nums)
+    # print("".join(decodeCFG(rules,nums)))
     # read through nums, counting the bigrams
     ind = -1
     while ind+1 < len(nums) and len(nums)>2:
@@ -147,12 +147,20 @@ def decodeCFG(rules,nums,numsind=0):
   buffer.extend(decodeCFG(rules,nums,numsind+1))
   return buffer
 
-if __name__ == '__main__':
-  # print(sequitur("aaa"))
-  # s = "aaaaaaaaaaaa"
-  s = "bananabananabananabanana"
+def teststr(s):
   rules,nums = sequitur(s)
-  print(list(enumerate(rules)),"\t",nums)
+  # print(list(enumerate(rules)),"\t",nums)
   d = ''.join(decodeCFG(rules,nums))
-  print(d)
+  # print(d)
   assert s==d
+
+if __name__ == '__main__':
+  import numpy as np
+  lens = np.random.rand(1000) * 100
+  for ln in lens:
+    ln = int(ln)
+    chars = [int(np.random.rand()*len(acceptable_chars)) for _ in range(ln)]
+    chars = [acceptable_chars[ch] for ch in chars]
+    teststr("".join(chars))
+
+  
