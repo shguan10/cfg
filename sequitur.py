@@ -10,6 +10,8 @@ def sequitur(s):
   while True:
     bigrams = []
     addedrule = False
+    print(list(enumerate(rules)),"\t",nums)
+    print("".join(decodeCFG(rules,nums)))
     # read through nums, counting the bigrams
     ind = -1
     while ind+1 < len(nums) and len(nums)>2:
@@ -30,7 +32,7 @@ def sequitur(s):
           bmatch = ii
       if bmatch is None:
         # we have not seen this bigram yet, so add it to bigrams
-        bigrams.append((prevchar,curchar,ind,ind-1))
+        bigrams.append((prevchar,curchar,ind-1,ind))
       else:
         # check if it is in rules
         rmatch = None
@@ -38,6 +40,12 @@ def sequitur(s):
           if len(r)==2 and r[0]==prevchar and r[1] == curchar:
             rmatch = ii
         if rmatch is None:
+          # check if the original bigram is marked to be replaced by another rule
+          # if so, then we don't add a new rule because this bigram is the first time we've seen it
+          if nums[bigrams[bmatch][2]] < 0 or nums[bigrams[bmatch][3]] < 0:
+            bigrams[bmatch] = (prevchar,curchar,ind-1,ind)
+            continue
+
           # put it in rules
           addedrule = True
           rmatch = len(rules)
@@ -76,32 +84,32 @@ def sequitur(s):
 
   # consider if we have to prune our rules
 
-  # count the number of times a rule appears
-  rcounts = [0 for _ in range(len(rules))]
-  rlocs = [None for _ in range(len(rules))]
-  rname = startofnonterminals
-  while rname < len(rules):
-    # read the rule
-    for place,ch in enumerate(rules[rname]):
-      rcounts[ch] += 1
-      # keep track of in which rule and where in the rule it is used
-      rlocs[ch] = (rname,place)
-    rname+=1
+  # # count the number of times a rule appears
+  # rcounts = [0 for _ in range(len(rules))]
+  # rlocs = [None for _ in range(len(rules))]
+  # rname = startofnonterminals
+  # while rname < len(rules):
+  #   # read the rule
+  #   for place,ch in enumerate(rules[rname]):
+  #     rcounts[ch] += 1
+  #     # keep track of in which rule and where in the rule it is used
+  #     rlocs[ch] = (rname,place)
+  #   rname+=1
 
-  # now prune the rules that only appeared once
-  rname = startofnonterminals
-  while rname < len(rules):
-    # how many times did it appear?
-    if rcounts[rname]==1:
-      # prune it!
-      user,userplace = rlocs[rname]
-      prevrule = list(rules[user])
-      newrule = prevrule[:userplace] + \
-                list(rules[rname]) + \
-                (prevrule[userplace+1:] 
-                  if userplace < len(prevrule) else [])
-      rules[user] = newrule
-    rname+=1
+  # # now prune the rules that only appeared once
+  # rname = startofnonterminals
+  # while rname < len(rules):
+  #   # how many times did it appear?
+  #   if rcounts[rname]==1:
+  #     # prune it!
+  #     user,userplace = rlocs[rname]
+  #     prevrule = list(rules[user])
+  #     newrule = prevrule[:userplace] + \
+  #               list(rules[rname]) + \
+  #               (prevrule[userplace+1:] 
+  #                 if userplace < len(prevrule) else [])
+  #     rules[user] = newrule
+  #   rname+=1
 
   return rules,nums
 
@@ -124,4 +132,9 @@ def decodeCFG(rules,nums,numsind=0):
 if __name__ == '__main__':
   # print(sequitur("aaa"))
   # print(sequitur("anan anan  anan anan"))
-  print(''.join(decodeCFG(*sequitur("banana"))))
+  s = "bananabanana"
+  rules,nums = sequitur(s)
+  print(list(enumerate(rules)),"\t",nums)
+  d = ''.join(decodeCFG(rules,nums))
+  print(d)
+  assert s==d
