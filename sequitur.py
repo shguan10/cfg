@@ -10,12 +10,16 @@ def sequitur(s):
   while True:
     bigrams = []
     addedrule = False
-    # print(list(enumerate(rules)),"\t",nums)
-    # print("".join(decodeCFG(rules,nums)))
+    print(list(enumerate(rules)),"\t",nums)
+    print("".join(decodeCFG(rules,nums)))
     # read through nums, counting the bigrams
     ind = -1
     while ind+1 < len(nums) and len(nums)>2:
       ind += 1
+      # ding =ind
+      # print("processing",ding)
+      # print(list(enumerate(rules)),"\t",nums)
+      # print(bigrams)
       if ind==0: continue
       prevchar = nums[ind-1]
       curchar = nums[ind]
@@ -34,6 +38,9 @@ def sequitur(s):
         # we have not seen this bigram yet, so add it to bigrams
         bigrams.append((prevchar,curchar,ind-1,ind))
       else:
+        # skip if the original bigram overlaps with the current one
+        if bigrams[bmatch][3] == ind-1: continue
+
         # check if it is in rules
         rmatch = None
         for ii,r in enumerate(rules): 
@@ -61,7 +68,9 @@ def sequitur(s):
         
         # we are replacing this bigram with a rule so skip the next bigram
         ind+=1
-    
+        # print("processed",ding)
+        # print(list(enumerate(rules)),"\t",nums)
+        # print(bigrams)
     # replace the string with the new chars
     if addedrule:
       newnums = []
@@ -118,10 +127,9 @@ def sequitur(s):
       # print("new rules: ")
       # print(list(enumerate(rules)))
       # print("".join(decodeCFG(rules,nums)))
-
     rname+=1
 
-  return rules,nums
+  return rules,rules[-1]
 
 def decodeCFG(rules,nums,numsind=0):
   # decodes the nums according to rules
@@ -141,8 +149,8 @@ def decodeCFG(rules,nums,numsind=0):
 
 if __name__ == '__main__':
   # print(sequitur("aaa"))
-  # print(sequitur("anan anan  anan anan"))
-  s = "bananabanana"
+  # s = "aaaaaaaaaaaa"
+  s = "bananabananabananabanana"
   rules,nums = sequitur(s)
   print(list(enumerate(rules)),"\t",nums)
   d = ''.join(decodeCFG(rules,nums))
